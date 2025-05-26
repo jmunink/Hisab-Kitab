@@ -14,7 +14,7 @@ interface LoginForm {
 }
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const router = useRouter();
   const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +33,6 @@ export default function LoginScreen() {
       setIsLoading(true);
       setError(null);
       
-      // Save remember me preference
       if (data.rememberMe) {
         await AsyncStorage.setItem('rememberMe', 'true');
         await AsyncStorage.setItem('userEmail', data.email);
@@ -43,9 +42,20 @@ export default function LoginScreen() {
       }
       
       await signIn(data.email, data.password);
-      // Navigation handled by AuthContext
     } catch (err) {
       setError('Invalid email or password. Try using "john@example.com".');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      await signInWithGoogle();
+    } catch (err) {
+      setError('Google sign in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +65,6 @@ export default function LoginScreen() {
     router.push('/(auth)/signup');
   };
 
-  // Hint for the demo app
   const applyDemoCredentials = () => {
     control._formValues.email = 'john@example.com';
     control._formValues.password = 'password';
@@ -165,6 +174,17 @@ export default function LoginScreen() {
         >
           Sign In
         </Button>
+
+        <Button
+          mode="outlined"
+          onPress={handleGoogleSignIn}
+          loading={isLoading}
+          disabled={isLoading}
+          style={styles.googleButton}
+          icon="google"
+        >
+          Sign in with Google
+        </Button>
         
         <TouchableOpacity onPress={applyDemoCredentials} style={styles.demoContainer}>
           <Text style={styles.demoText}>Use demo credentials</Text>
@@ -217,6 +237,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   button: {
+    padding: 4,
+    marginBottom: 16,
+  },
+  googleButton: {
     padding: 4,
     marginBottom: 16,
   },

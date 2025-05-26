@@ -1,15 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
 import { Group, Expense, User, ExpenseSplit, Settlement, SplitMethod } from '@/types';
 
 // Mock users for demo
 const MOCK_USERS: User[] = [
-  { id: '1', name: 'John Doe', email: 'john@example.com' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com' },
-  { id: '3', name: 'Bob Wilson', email: 'bob@example.com' },
-  { id: '4', name: 'Alice Brown', email: 'alice@example.com' },
-  { id: '5', name: 'Charlie Davis', email: 'charlie@example.com' },
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
+  },
+  {
+    id: '3',
+    name: 'Bob Johnson',
+    email: 'bob@example.com',
+    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
+  },
 ];
 
 // Mock groups
@@ -75,25 +88,6 @@ const MOCK_EXPENSES: Expense[] = [
     category: 'Food',
     notes: 'Seafood restaurant',
     settled: false
-  },
-  {
-    id: '3',
-    groupId: '2',
-    title: 'Monthly Rent',
-    amount: 1500,
-    paidBy: [
-      { userId: '1', amount: 1500 }
-    ],
-    splitBetween: [
-      { userId: '1', amount: 500 },
-      { userId: '2', amount: 500 },
-      { userId: '3', amount: 500 }
-    ],
-    splitMethod: SplitMethod.EQUAL,
-    date: new Date('2024-01-01'),
-    createdAt: new Date('2024-01-01'),
-    category: 'Rent',
-    settled: false
   }
 ];
 
@@ -152,42 +146,43 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [groups, setGroups] = useState<Group[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
-  // Load initial data
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const storedGroups = await AsyncStorage.getItem('groups');
-        const storedExpenses = await AsyncStorage.getItem('expenses');
+  // Load initial data only once using useCallback
+  const loadData = useCallback(async () => {
+    try {
+      const storedGroups = await AsyncStorage.getItem('groups');
+      const storedExpenses = await AsyncStorage.getItem('expenses');
 
-        if (storedGroups) {
-          const parsedGroups = JSON.parse(storedGroups);
-          setGroups(parsedGroups.map((group: any) => ({
-            ...group,
-            createdAt: new Date(group.createdAt)
-          })));
-        } else {
-          setGroups(MOCK_GROUPS);
-          await AsyncStorage.setItem('groups', JSON.stringify(MOCK_GROUPS));
-        }
-
-        if (storedExpenses) {
-          const parsedExpenses = JSON.parse(storedExpenses);
-          setExpenses(parsedExpenses.map((expense: any) => ({
-            ...expense,
-            date: new Date(expense.date),
-            createdAt: new Date(expense.createdAt)
-          })));
-        } else {
-          setExpenses(MOCK_EXPENSES);
-          await AsyncStorage.setItem('expenses', JSON.stringify(MOCK_EXPENSES));
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
+      if (storedGroups) {
+        const parsedGroups = JSON.parse(storedGroups);
+        setGroups(parsedGroups.map((group: any) => ({
+          ...group,
+          createdAt: new Date(group.createdAt)
+        })));
+      } else {
+        setGroups(MOCK_GROUPS);
+        await AsyncStorage.setItem('groups', JSON.stringify(MOCK_GROUPS));
       }
-    };
 
-    loadData();
+      if (storedExpenses) {
+        const parsedExpenses = JSON.parse(storedExpenses);
+        setExpenses(parsedExpenses.map((expense: any) => ({
+          ...expense,
+          date: new Date(expense.date),
+          createdAt: new Date(expense.createdAt)
+        })));
+      } else {
+        setExpenses(MOCK_EXPENSES);
+        await AsyncStorage.setItem('expenses', JSON.stringify(MOCK_EXPENSES));
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
   }, []);
+
+  // Load data on mount
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const createGroup = async (
     name: string,
@@ -242,49 +237,45 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newExpense;
   };
 
-  const getGroupExpenses = (groupId: string) => {
+  const getGroupExpenses = useCallback((groupId: string) => {
     return expenses.filter(expense => expense.groupId === groupId);
-  };
+  }, [expenses]);
 
-  const getExpense = (expenseId: string) => {
+  const getExpense = useCallback((expenseId: string) => {
     return expenses.find(expense => expense.id === expenseId);
-  };
+  }, [expenses]);
 
-  const getGroup = (groupId: string) => {
+  const getGroup = useCallback((groupId: string) => {
     return groups.find(group => group.id === groupId);
-  };
+  }, [groups]);
 
-  const getGroupBalances = (groupId: string) => {
+  const getGroupBalances = useCallback((groupId: string) => {
     const balances: Record<string, number> = {};
     const groupExpenses = getGroupExpenses(groupId);
-
-    // Initialize balances
     const group = getGroup(groupId);
+
     if (group) {
       group.members.forEach(member => {
         balances[member.id] = 0;
       });
+
+      groupExpenses.forEach(expense => {
+        if (!expense.settled) {
+          expense.paidBy.forEach(payment => {
+            balances[payment.userId] = (balances[payment.userId] || 0) + payment.amount;
+          });
+
+          expense.splitBetween.forEach(split => {
+            balances[split.userId] = (balances[split.userId] || 0) - split.amount;
+          });
+        }
+      });
     }
 
-    // Calculate balances
-    groupExpenses.forEach(expense => {
-      if (!expense.settled) {
-        // Add amounts paid
-        expense.paidBy.forEach(payment => {
-          balances[payment.userId] = (balances[payment.userId] || 0) + payment.amount;
-        });
-
-        // Subtract amounts owed
-        expense.splitBetween.forEach(split => {
-          balances[split.userId] = (balances[split.userId] || 0) - split.amount;
-        });
-      }
-    });
-
     return balances;
-  };
+  }, [getGroupExpenses, getGroup]);
 
-  const getUserBalance = () => {
+  const getUserBalance = useCallback(() => {
     let totalOwed = 0;
     let totalOwedToUser = 0;
 
@@ -300,9 +291,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return { totalOwed, totalOwedToUser };
-  };
+  }, [groups, getGroupBalances]);
 
-  const getSettlements = (groupId: string) => {
+  const getSettlements = useCallback((groupId: string) => {
     const balances = getGroupBalances(groupId);
     const group = getGroup(groupId);
     const settlements: Settlement[] = [];
@@ -353,7 +344,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return settlements;
-  };
+  }, [getGroupBalances, getGroup]);
 
   const settleExpense = async (expenseId: string) => {
     const updatedExpenses = expenses.map(expense =>
@@ -363,7 +354,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await AsyncStorage.setItem('expenses', JSON.stringify(updatedExpenses));
   };
 
-  const getAllUsers = () => MOCK_USERS;
+  const getAllUsers = useCallback(() => MOCK_USERS, []);
 
   return (
     <DataContext.Provider

@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useSegments } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import { User } from '@/types';
+
+WebBrowser.maybeCompleteAuthSession();
 
 interface AuthContextType {
   user: User | null;
@@ -9,6 +13,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
+  signInWithGoogle: async () => {},
 });
 
 // Mock users for demo
@@ -47,6 +53,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
   const segments = useSegments();
 
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: "YOUR_ANDROID_CLIENT_ID",
+    iosClientId: "YOUR_IOS_CLIENT_ID",
+    webClientId: "YOUR_WEB_CLIENT_ID",
+  });
+
   // Check for stored user session
   useEffect(() => {
     const loadUser = async () => {
@@ -65,6 +77,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadUser();
   }, []);
 
+  // Handle Google Sign In response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      // Here you would typically validate the token with your backend
+      // For demo, we'll create a mock user
+      const mockGoogleUser: User = {
+        id: Math.random().toString(36).substring(2, 11),
+        name: 'Google User',
+        email: 'google@example.com',
+        avatar: 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg',
+      };
+      setUser(mockGoogleUser);
+      AsyncStorage.setItem('user', JSON.stringify(mockGoogleUser));
+    }
+  }, [response]);
+
   // Handle routing based on auth state
   useEffect(() => {
     if (isLoading) return;
@@ -72,29 +101,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!user && !inAuthGroup) {
-      // Redirect to auth if no user and not in auth group
       router.replace('/(auth)/login');
     } else if (user && inAuthGroup) {
-      // Redirect to home if user exists and in auth group
       router.replace('/(tabs)/home');
     }
   }, [user, segments, isLoading, router]);
 
-  // Sign in function
+  const signInWithGoogle = async () => {
+    try {
+      await promptAsync();
+    } catch (error) {
+      console.error('Google sign in failed:', error);
+      throw error;
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
-      // Simulate API call
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Find user (in a real app, this would be an API call)
       const foundUser = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
       
       if (!foundUser) {
         throw new Error('Invalid email or password');
       }
 
-      // Save user to storage
       await AsyncStorage.setItem('user', JSON.stringify(foundUser));
       setUser(foundUser);
     } catch (error) {
@@ -105,19 +137,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Sign up function
   const signUp = async (name: string, email: string, password: string) => {
     try {
-      // Simulate API call
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Check if email exists (in a real app, this would be an API call)
       if (MOCK_USERS.some(u => u.email.toLowerCase() === email.toLowerCase())) {
         throw new Error('Email already in use');
       }
 
-      // Create new user (in a real app, this would be an API call)
       const newUser: User = {
         id: Math.random().toString(36).substring(2, 11),
         name,
@@ -125,7 +153,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
       };
 
-      // Save user to storage
       await AsyncStorage.setItem('user', JSON.stringify(newUser));
       setUser(newUser);
     } catch (error) {
@@ -136,10 +163,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Sign out function
   const signOut = async () => {
     try {
-      // Remove user from storage
       await AsyncStorage.removeItem('user');
       setUser(null);
     } catch (error) {
@@ -149,7 +174,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      signIn, 
+      signUp, 
+      signOut,
+      signInWithGoogle 
+    }}>
       {children}
     </AuthContext.Provider>
   );
