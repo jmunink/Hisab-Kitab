@@ -43,6 +43,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 8,
     elevation: 2,
+   textAlign: 'center',
+   color: 'black',
+    borderRadius: 8,
+
+    
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
   },
   title: {
     fontSize: 14,

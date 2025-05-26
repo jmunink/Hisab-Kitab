@@ -28,6 +28,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
+          headerShown: false,
+          tabBarActiveBackgroundColor: theme.colors.primary,
+          tabBarActiveTintColor: theme.colors.onPrimary,
+          tabBarInactiveBackgroundColor: theme.colors.surface,
+          tabBarInactiveTintColor: isDark ? '#999' : '#666',
+          tabBarLabelStyle: {
+            fontFamily: 'Inter-SemiBold',
+            fontWeight: '600',
+          },
           title: 'Home',
           tabBarIcon: ({ color, size }) => (
             <Home size={size} color={color} />

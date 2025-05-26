@@ -88,75 +88,96 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
     </Card>
   );
 };
-
 const styles = StyleSheet.create({
   card: {
-    marginVertical: 4,
-    marginHorizontal: 8,
-    elevation: 2,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   content: {
-    padding: 12,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   titleContainer: {
     flex: 1,
-    marginRight: 16,
+    marginRight: 12,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     fontFamily: 'Inter-SemiBold',
+    color: 'black',
   },
   groupName: {
     fontSize: 14,
-    opacity: 0.7,
+fontFamily: 'Inter-Regular',
+fontWeight: '500',
+    color: 'black',
     marginTop: 2,
   },
   amount: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     fontFamily: 'Inter-SemiBold',
+    color: '#111',
   },
   details: {
-    marginTop: 8,
+    marginTop: 4,
   },
   payerInfo: {
     marginBottom: 8,
   },
   payerLabel: {
     fontSize: 14,
-    opacity: 0.7,
+    fontFamily: 'Inter-Medium',
+    color: '#888',
     marginBottom: 2,
   },
   payer: {
     fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#333',
+    marginVertical: 1,
   },
   metaContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 8,
+    alignItems: 'center',
+    marginTop: 4,
   },
   date: {
     fontSize: 12,
-    opacity: 0.6,
+    color: '#111',
+    fontFamily: 'Inter-Regular',
   },
   categoryChip: {
-    height: 24,
+    height: 38,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ddd',
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 16,
+    fontFamily: 'Inter-Medium',
+    color: '#444',
   },
   notes: {
     fontSize: 14,
-    opacity: 0.7,
-    marginTop: 8,
     fontStyle: 'italic',
+    color: '#444',
+    marginTop: 10,
+    lineHeight: 20,
   },
 });
