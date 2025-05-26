@@ -1,33 +1,32 @@
 import { MD3LightTheme, configureFonts } from 'react-native-paper';
 
-// Define the color palette
 const colors = {
   primary: {
-    main: '#0BB8A4', // Teal
-    light: '#49E4D3',
-    dark: '#078F7E',
+    main: '#6366F1', // Indigo
+    light: '#818CF8',
+    dark: '#4F46E5',
     contrast: '#FFFFFF',
   },
   secondary: {
-    main: '#FF5A5F', // Coral
-    light: '#FF8A8F',
-    dark: '#E02A30',
+    main: '#EC4899', // Pink
+    light: '#F472B6',
+    dark: '#DB2777',
     contrast: '#FFFFFF',
   },
   success: {
-    main: '#4CAF50',
-    light: '#7BC67E',
-    dark: '#3B873E',
+    main: '#10B981',
+    light: '#34D399',
+    dark: '#059669',
   },
   warning: {
-    main: '#FFC107',
-    light: '#FFD54F',
-    dark: '#FFA000',
+    main: '#F59E0B',
+    light: '#FBBF24',
+    dark: '#D97706',
   },
   error: {
-    main: '#F44336',
-    light: '#EF9A9A',
-    dark: '#C62828',
+    main: '#EF4444',
+    light: '#F87171',
+    dark: '#DC2626',
   },
   grey: {
     50: '#F9FAFB',
@@ -43,7 +42,6 @@ const colors = {
   },
 };
 
-// Define custom font configuration
 const fontConfig = {
   fontFamily: 'Inter-Regular',
   headingFontFamily: 'Inter-Bold',
@@ -72,7 +70,6 @@ const customFonts = configureFonts({
   },
 });
 
-// Create theme
 export const theme = {
   ...MD3LightTheme,
   fonts: customFonts,
@@ -91,10 +88,9 @@ export const theme = {
     placeholder: colors.grey[500],
     backdrop: 'rgba(0, 0, 0, 0.5)',
   },
-  roundness: 8,
+  roundness: 12,
 };
 
-// Dark theme
 export const darkTheme = {
   ...theme,
   dark: true,

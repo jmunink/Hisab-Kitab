@@ -19,8 +19,8 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
 
   return (
     <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
-      <Card.Content>
-        <Text style={styles.title}>{title}</Text>
+      <Card.Content style={styles.content}>
+        <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
         <Text
           style={[
             styles.amount,
@@ -42,25 +42,27 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     marginHorizontal: 8,
-    elevation: 2,
-   textAlign: 'center',
-   color: 'black',
-    borderRadius: 8,
-
-    
+    elevation: 3,
+    borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  content: {
+    padding: 16,
   },
   title: {
     fontSize: 14,
-    marginBottom: 4,
+    marginBottom: 8,
     opacity: 0.7,
+    fontFamily: 'Inter-Medium',
   },
   amount: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '600',
     fontFamily: 'Inter-SemiBold',
   },

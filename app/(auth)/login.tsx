@@ -87,12 +87,16 @@ export default function LoginScreen() {
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to continue</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>Welcome Back</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.placeholder }]}>
+          Sign in to continue
+        </Text>
       </View>
       
       {error && (
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={[styles.errorText, { color: theme.colors.error }]}>
+          {error}
+        </Text>
       )}
       
       <View style={styles.form}>
@@ -121,7 +125,9 @@ export default function LoginScreen() {
           name="email"
         />
         {errors.email && (
-          <Text style={styles.errorText}>{errors.email.message}</Text>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
+            {errors.email.message}
+          </Text>
         )}
         
         <Controller
@@ -148,7 +154,9 @@ export default function LoginScreen() {
           name="password"
         />
         {errors.password && (
-          <Text style={styles.errorText}>{errors.password.message}</Text>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
+            {errors.password.message}
+          </Text>
         )}
         
         <Controller
@@ -158,8 +166,11 @@ export default function LoginScreen() {
               <Checkbox
                 status={value ? 'checked' : 'unchecked'}
                 onPress={() => onChange(!value)}
+                color={theme.colors.primary}
               />
-              <Text style={styles.checkboxLabel}>Remember me</Text>
+              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>
+                Remember me
+              </Text>
             </View>
           )}
           name="rememberMe"
@@ -171,9 +182,16 @@ export default function LoginScreen() {
           loading={isLoading}
           disabled={isLoading}
           style={styles.button}
+          contentStyle={styles.buttonContent}
         >
           Sign In
         </Button>
+
+        <View style={styles.divider}>
+          <View style={[styles.dividerLine, { backgroundColor: theme.colors.placeholder }]} />
+          <Text style={[styles.dividerText, { color: theme.colors.placeholder }]}>or</Text>
+          <View style={[styles.dividerLine, { backgroundColor: theme.colors.placeholder }]} />
+        </View>
 
         <Button
           mode="outlined"
@@ -181,18 +199,23 @@ export default function LoginScreen() {
           loading={isLoading}
           disabled={isLoading}
           style={styles.googleButton}
+          contentStyle={styles.buttonContent}
           icon="google"
         >
           Sign in with Google
         </Button>
         
         <TouchableOpacity onPress={applyDemoCredentials} style={styles.demoContainer}>
-          <Text style={styles.demoText}>Use demo credentials</Text>
+          <Text style={[styles.demoText, { color: theme.colors.placeholder }]}>
+            Use demo credentials
+          </Text>
         </TouchableOpacity>
       </View>
       
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account?</Text>
+        <Text style={[styles.footerText, { color: theme.colors.text }]}>
+          Don't have an account?
+        </Text>
         <TouchableOpacity onPress={goToSignup}>
           <Text style={[styles.footerLink, { color: theme.colors.primary }]}>
             Sign Up
@@ -213,20 +236,20 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
     fontFamily: 'Inter-Bold',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    opacity: 0.6,
+    fontFamily: 'Inter-Regular',
   },
   form: {
     marginBottom: 24,
   },
   input: {
     marginBottom: 16,
+    backgroundColor: 'transparent',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -235,13 +258,33 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     marginLeft: 8,
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
   },
   button: {
-    padding: 4,
+    borderRadius: 12,
     marginBottom: 16,
   },
+  buttonContent: {
+    paddingVertical: 8,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    opacity: 0.2,
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+  },
   googleButton: {
-    padding: 4,
+    borderRadius: 12,
     marginBottom: 16,
   },
   demoContainer: {
@@ -250,7 +293,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   demoText: {
-    color: '#666',
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
     textDecorationLine: 'underline',
   },
   footer: {
@@ -260,13 +304,16 @@ const styles = StyleSheet.create({
   },
   footerText: {
     marginRight: 4,
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
   },
   footerLink: {
-    fontWeight: '600',
     fontFamily: 'Inter-SemiBold',
+    fontSize: 14,
   },
   errorText: {
-    color: 'red',
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
     marginBottom: 12,
     marginTop: -8,
   },

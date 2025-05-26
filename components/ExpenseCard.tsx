@@ -47,31 +47,41 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>{expense.title}</Text>
+            <Text style={[styles.title, { color: theme.colors.text }]}>
+              {expense.title}
+            </Text>
             {showGroup && group && (
-              <Text style={styles.groupName}>{group.name}</Text>
+              <Text style={[styles.groupName, { color: theme.colors.primary }]}>
+                {group.name}
+              </Text>
             )}
           </View>
-          <Text style={styles.amount}>{formatCurrency(expense.amount)}</Text>
+          <Text style={[styles.amount, { color: theme.colors.text }]}>
+            {formatCurrency(expense.amount)}
+          </Text>
         </View>
         
         <View style={styles.details}>
           <View style={styles.payerInfo}>
-            <Text style={styles.payerLabel}>Paid by:</Text>
+            <Text style={[styles.payerLabel, { color: theme.colors.placeholder }]}>
+              Paid by:
+            </Text>
             {payers.map((payer, index) => (
-              <Text key={index} style={styles.payer}>
+              <Text key={index} style={[styles.payer, { color: theme.colors.text }]}>
                 {payer.name} ({formatCurrency(payer.amount)})
               </Text>
             ))}
           </View>
           
           <View style={styles.metaContainer}>
-            <Text style={styles.date}>{formattedDate}</Text>
+            <Text style={[styles.date, { color: theme.colors.placeholder }]}>
+              {formattedDate}
+            </Text>
             {expense.category && (
               <Chip 
                 mode="outlined" 
-                style={styles.categoryChip}
-                textStyle={styles.categoryText}
+                style={[styles.categoryChip, { borderColor: theme.colors.primary }]}
+                textStyle={[styles.categoryText, { color: theme.colors.primary }]}
               >
                 {expense.category}
               </Chip>
@@ -80,7 +90,10 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
         </View>
         
         {expense.notes && (
-          <Text style={styles.notes} numberOfLines={2}>
+          <Text 
+            style={[styles.notes, { color: theme.colors.placeholder }]} 
+            numberOfLines={2}
+          >
             {expense.notes}
           </Text>
         )}
@@ -88,96 +101,83 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
     </Card>
   );
 };
+
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginVertical: 8,
-    borderRadius: 12,
+    borderRadius: 16,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: 4,
   },
   content: {
     padding: 16,
-    borderRadius: 12,
-    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   titleContainer: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: 'black',
+    marginBottom: 4,
   },
   groupName: {
     fontSize: 14,
-fontFamily: 'Inter-Regular',
-fontWeight: '500',
-    color: 'black',
-    marginTop: 2,
+    fontFamily: 'Inter-Medium',
   },
   amount: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 18,
     fontFamily: 'Inter-SemiBold',
-    color: '#111',
   },
   details: {
-    marginTop: 4,
+    marginTop: 8,
   },
   payerInfo: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   payerLabel: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
-    color: '#888',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   payer: {
     fontSize: 14,
     fontFamily: 'Inter-Regular',
-    color: '#333',
-    marginVertical: 1,
+    marginVertical: 2,
   },
   metaContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 8,
   },
   date: {
     fontSize: 12,
-    color: '#111',
     fontFamily: 'Inter-Regular',
   },
   categoryChip: {
-    height: 38,
-    borderRadius: 16,
-    backgroundColor: '#f0f0f0',
-    borderColor: '#ddd',
+    height: 28,
+    borderRadius: 14,
   },
   categoryText: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#444',
   },
   notes: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#444',
-    marginTop: 10,
+    marginTop: 12,
     lineHeight: 20,
+    fontFamily: 'Inter-Regular',
   },
 });
