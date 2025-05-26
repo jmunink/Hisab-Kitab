@@ -97,5 +97,11 @@ const styles = StyleSheet.create({
   memberCount: {
     fontSize: 14,
     opacity: 0.6,
+    color: 'black',
+    fontFamily: 'Inter-Regular',
+    textAlign: 'right',
+    flex: 1,
+    marginLeft: 16,
+    maxWidth: 100, // Limit width to prevent overflow
   },
 });

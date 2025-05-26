@@ -45,7 +45,15 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="groups"
-        options={{
+        options={{headerShown: false,
+          tabBarActiveBackgroundColor: theme.colors.primary,
+          tabBarActiveTintColor: theme.colors.onPrimary,
+          tabBarInactiveBackgroundColor: theme.colors.surface,
+          tabBarInactiveTintColor: isDark ? '#999' : '#666',
+          tabBarLabelStyle: {
+            fontFamily: 'Inter-SemiBold',
+            fontWeight: '600',
+          },
           title: 'Groups',
           tabBarIcon: ({ color, size }) => (
             <UsersRound size={size} color={color} />
@@ -54,7 +62,15 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="transactions"
-        options={{
+        options={{headerShown: false,
+          tabBarActiveBackgroundColor: theme.colors.primary,
+          tabBarActiveTintColor: theme.colors.onPrimary,
+          tabBarInactiveBackgroundColor: theme.colors.surface,
+          tabBarInactiveTintColor: isDark ? '#999' : '#666',
+          tabBarLabelStyle: {
+            fontFamily: 'Inter-SemiBold',
+            fontWeight: '600',
+          },
           title: 'Activity',
           tabBarIcon: ({ color, size }) => (
             <Receipt size={size} color={color} />
@@ -63,7 +79,15 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="profile"
-        options={{
+        options={{headerShown: false,
+          tabBarActiveBackgroundColor: theme.colors.primary,
+          tabBarActiveTintColor: theme.colors.onPrimary,
+          tabBarInactiveBackgroundColor: theme.colors.surface,
+          tabBarInactiveTintColor: isDark ? '#999' : '#666',
+          tabBarLabelStyle: {
+            fontFamily: 'Inter-SemiBold',
+            fontWeight: '600',
+          },
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} />

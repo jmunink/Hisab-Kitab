@@ -120,6 +120,11 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 40,
+    backgroundColor: '#fff',
+    paddingBottom: 16,
+    
+    
   },
   header: {
     padding: 16,
