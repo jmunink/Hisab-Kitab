@@ -1,0 +1,7 @@
+Download these fonts from Google Fonts:
+- Inter-Regular.ttf
+- Inter-Medium.ttf
+- Inter-SemiBold.ttf
+- Inter-Bold.ttf
+
+Store them in this directory.
