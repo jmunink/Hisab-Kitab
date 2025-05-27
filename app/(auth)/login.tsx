@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Text, TextInput, Button, Checkbox } from 'react-native-paper';
+import { Text, TextInput, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSignIn } from '@clerk/clerk-expo';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Controller, useForm } from 'react-hook-form';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useForm, Controller } from 'react-hook-form';
+import { useWarmUpBrowser } from '@/hooks/useWarmUpBrowser';
 
 interface LoginForm {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 export default function LoginScreen() {
-  const { signIn, signInWithGoogle } = useAuth();
+  useWarmUpBrowser();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
   const { theme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,26 +24,29 @@ export default function LoginScreen() {
     defaultValues: {
       email: '',
       password: '',
-      rememberMe: false,
     },
   });
 
   const onSubmit = async (data: LoginForm) => {
+    if (!isLoaded) return;
+
     try {
       setIsLoading(true);
       setError(null);
       
-      if (data.rememberMe) {
-        await AsyncStorage.setItem('rememberMe', 'true');
-        await AsyncStorage.setItem('userEmail', data.email);
+      const result = await signIn.create({
+        identifier: data.email,
+        password: data.password,
+      });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        router.replace('/(tabs)/home');
       } else {
-        await AsyncStorage.removeItem('rememberMe');
-        await AsyncStorage.removeItem('userEmail');
+        console.log(JSON.stringify(result, null, 2));
       }
-      
-      await signIn(data.email, data.password);
-    } catch (err) {
-      setError('Invalid email or password. Try using "john@example.com".');
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || 'An error occurred during sign in');
     } finally {
       setIsLoading(false);
     }
@@ -53,9 +56,16 @@ export default function LoginScreen() {
     try {
       setIsLoading(true);
       setError(null);
-      await signInWithGoogle();
-    } catch (err) {
-      setError('Google sign in failed. Please try again.');
+      
+      const result = await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/oauth-callback",
+        redirectUrlComplete: "/(tabs)/home",
+      });
+      
+      console.log(JSON.stringify(result, null, 2));
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || 'Google sign in failed');
     } finally {
       setIsLoading(false);
     }
@@ -63,19 +73,6 @@ export default function LoginScreen() {
 
   const goToSignup = () => {
     router.push('/(auth)/signup');
-  };
-
-  const applyDemoCredentials = () => {
-    control._formValues.email = 'john@example.com';
-    control._formValues.password = 'password';
-    control._updateFormState({
-      ...control._formState,
-      dirtyFields: {
-        ...control._formState.dirtyFields,
-        email: true,
-        password: true,
-      },
-    });
   };
 
   return (
@@ -159,23 +156,6 @@ export default function LoginScreen() {
           </Text>
         )}
         
-        <Controller
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <View style={styles.checkboxContainer}>
-              <Checkbox
-                status={value ? 'checked' : 'unchecked'}
-                onPress={() => onChange(!value)}
-                color={theme.colors.primary}
-              />
-              <Text style={[styles.checkboxLabel, { color: theme.colors.text }]}>
-                Remember me
-              </Text>
-            </View>
-          )}
-          name="rememberMe"
-        />
-        
         <Button
           mode="contained"
           onPress={handleSubmit(onSubmit)}
@@ -204,12 +184,6 @@ export default function LoginScreen() {
         >
           Sign in with Google
         </Button>
-        
-        <TouchableOpacity onPress={applyDemoCredentials} style={styles.demoContainer}>
-          <Text style={[styles.demoText, { color: theme.colors.placeholder }]}>
-            Use demo credentials
-          </Text>
-        </TouchableOpacity>
       </View>
       
       <View style={styles.footer}>
@@ -251,16 +225,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: 'transparent',
   },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  checkboxLabel: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-  },
   button: {
     borderRadius: 12,
     marginBottom: 16,
@@ -286,16 +250,6 @@ const styles = StyleSheet.create({
   googleButton: {
     borderRadius: 12,
     marginBottom: 16,
-  },
-  demoContainer: {
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  demoText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    textDecorationLine: 'underline',
   },
   footer: {
     flexDirection: 'row',

@@ -4,17 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts } from 'expo-font';
 import { SplashScreen } from 'expo-router';
-import { PaperProvider } from 'react-native-paper';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { DataProvider } from '@/contexts/DataContext';
-import { theme } from '@/constants/theme';
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { tokenCache } from '@/utils/tokenCache';
+import Constants from 'expo-constants';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -23,10 +15,10 @@ export default function RootLayout() {
   useFrameworkReady();
 
   const [fontsLoaded, fontError] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-Medium': Inter_500Medium,
-    'Inter-SemiBold': Inter_600SemiBold,
-    'Inter-Bold': Inter_700Bold,
+    'Inter-Regular': require('@expo-google-fonts/inter/Inter_400Regular.ttf'),
+    'Inter-Medium': require('@expo-google-fonts/inter/Inter_500Medium.ttf'),
+    'Inter-SemiBold': require('@expo-google-fonts/inter/Inter_600SemiBold.ttf'),
+    'Inter-Bold': require('@expo-google-fonts/inter/Inter_700Bold.ttf'),
   });
 
   // Hide splash screen once fonts are loaded
@@ -42,20 +34,17 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
-      <PaperProvider theme={theme}>
-        <AuthProvider>
-          <DataProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" options={{ headerShown: false }} />
-            </Stack>
-            <StatusBar style="auto" />
-          </DataProvider>
-        </AuthProvider>
-      </PaperProvider>
-    </ThemeProvider>
+    <ClerkProvider 
+      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}
+      tokenCache={tokenCache}
+    >
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" options={{ headerShown: false }} />
+      </Stack>
+      <StatusBar style="auto" />
+    </ClerkProvider>
   );
 }
