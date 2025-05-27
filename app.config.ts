@@ -8,4 +8,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     clerkPublishableKey: process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY,
   },
   scheme: 'splitwise',
+  web: {
+    bundler: 'metro'
+  },
+  plugins: [
+    'expo-router',
+    'expo-secure-store'
+  ]
 });
