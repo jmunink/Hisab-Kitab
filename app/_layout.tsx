@@ -11,6 +11,12 @@ import Constants from 'expo-constants';
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
+const publishableKey = Constants.expoConfig?.extra?.clerkPublishableKey;
+
+if (!publishableKey) {
+  throw new Error("Missing Clerk Publishable Key");
+}
+
 export default function RootLayout() {
   useFrameworkReady();
 
@@ -35,7 +41,7 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider 
-      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}
+      publishableKey={publishableKey}
       tokenCache={tokenCache}
     >
       <Stack screenOptions={{ headerShown: false }}>
